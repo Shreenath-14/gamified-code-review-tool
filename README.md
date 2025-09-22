@@ -45,7 +45,7 @@ Deployment: Vercel
 
 1. Clone this repo
 
-git clone https://github.com/your-username/gamified-code-review-tool.git
+git clone https://github.com/Shreenath-14/Gamified-Code-Review-Tool.git
 cd gamified-code-review-tool
 
 
@@ -87,7 +87,7 @@ Interactive UI: Integrated Monaco Editor to provide an in-browser coding experie
 
 ✅ Live Demo Link (Vercel)
 
-✅ GitHub Repository (this repo)
+✅ GitHub Repository ([this repo](https://github.com/Shreenath-14/Gamified-Code-Review-Tool.git))
 
 ✅ 10-Slide Project Presentation (attached separately)
 
