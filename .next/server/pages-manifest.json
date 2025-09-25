@@ -6,5 +6,8 @@
   "/api/auth/[...nextauth]": "pages/api/auth/[...nextauth].js",
   "/login": "pages/login.js",
   "/dashboard": "pages/dashboard.js",
-  "/api/leaderboard": "pages/api/leaderboard.js"
+  "/api/leaderboard": "pages/api/leaderboard.js",
+  "/api/challenges": "pages/api/challenges.js",
+  "/challenges": "pages/challenges.js",
+  "/leaderboard": "pages/leaderboard.js"
 }

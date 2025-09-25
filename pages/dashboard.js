@@ -4,7 +4,6 @@ import BadgePill from "../components/BadgePill"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { challenges } from "../lib/challenges"
 
 export default function Dashboard() {
   const { data: session, status } = useSession()
@@ -12,6 +11,7 @@ export default function Dashboard() {
   const [xp, setXp] = useState(0)
   const [rank, setRank] = useState("#-")
   const [solved, setSolved] = useState(0)
+  const [challenges, setChallenges] = useState([])
 
   // Protect route
   useEffect(() => {
@@ -20,13 +20,12 @@ export default function Dashboard() {
     }
   }, [status, router])
 
-  // Loading state
   if (status === "loading") {
     return <p className="p-6">Loading...</p>
   }
 
   if (!session) {
-    return null // avoids flicker before redirect
+    return null
   }
 
   // Fetch leaderboard + user data
@@ -36,14 +35,12 @@ export default function Dashboard() {
       const data = await res.json()
       const playerName = session?.user?.name || "Shree"
 
-      // find current player
       const player = data.find((p) => p.name === playerName)
       if (player) {
         setXp(player.score)
-        setSolved((player.solved || []).length) // safe fallback
+        setSolved((player.solved || []).length)
       }
 
-      // rank is just index + 1
       const sorted = [...data].sort((a, b) => b.score - a.score)
       const index = sorted.findIndex((p) => p.name === playerName)
       if (index !== -1) {
@@ -55,6 +52,21 @@ export default function Dashboard() {
       fetchData()
     }
   }, [session])
+
+  // Fetch challenges from Supabase via API
+  useEffect(() => {
+    async function fetchChallenges() {
+      try {
+        const res = await fetch("/api/challenges")
+        if (!res.ok) throw new Error("Failed to fetch challenges")
+        const data = await res.json()
+        setChallenges(data.slice(0, 6)) // show only top 6 popular challenges
+      } catch (err) {
+        console.error("Error fetching challenges:", err)
+      }
+    }
+    fetchChallenges()
+  }, [])
 
   return (
     <main className="max-w-6xl mx-auto p-6">
@@ -88,21 +100,19 @@ export default function Dashboard() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-4">Popular Challenges</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {challenges.map((c) => (
-            <ChallengeCard
-              key={c.id}
-              title={c.title}
-              difficulty={
-                c.points === 20
-                  ? "Easy"
-                  : c.points === 40
-                  ? "Medium"
-                  : "Hard"
-              }
-              points={c.points}
-              onOpen={() => router.push(`/challenges/${c.id}`)}
-            />
-          ))}
+          {challenges.length === 0 ? (
+            <p>No challenges available. Add some in Supabase.</p>
+          ) : (
+            challenges.map((c) => (
+              <ChallengeCard
+                key={c.id}
+                title={c.title}
+                difficulty={c.difficulty}
+                points={c.points}
+                onOpen={() => router.push(`/challenges/${c.id}`)}
+              />
+            ))
+          )}
         </div>
       </section>
     </main>
