@@ -28,30 +28,35 @@ export default function Dashboard() {
     return null
   }
 
-  // Fetch leaderboard + user data
+  // Fetch user stats directly from Supabase API
   useEffect(() => {
-    async function fetchData() {
-      const res = await fetch("/api/leaderboard")
-      const data = await res.json()
-      const playerName = session?.user?.name || "Shree"
+    async function fetchUserStats() {
+      if (!session?.user?.email) return
 
-      const player = data.find((p) => p.name === playerName)
-      if (player) {
-        setXp(player.score)
-        setSolved((player.solved || []).length)
-      }
+      try {
+        const res = await fetch(`/api/user/${session.user.email}`)
+        if (!res.ok) throw new Error("Failed to fetch user stats")
+        const data = await res.json()
 
-      const sorted = [...data].sort((a, b) => b.score - a.score)
-      const index = sorted.findIndex((p) => p.name === playerName)
-      if (index !== -1) {
-        setRank(`#${index + 1}`)
+        setXp(data.score || 0)
+        setSolved((data.solved || []).length || 0)
+
+        // rank could still be from leaderboard if you want
+        const leaderboardRes = await fetch("/api/leaderboard")
+        if (leaderboardRes.ok) {
+          const lbData = await leaderboardRes.json()
+          const sorted = [...lbData].sort((a, b) => b.score - a.score)
+          const index = sorted.findIndex((p) => p.email === session.user.email)
+          if (index !== -1) setRank(`#${index + 1}`)
+        }
+      } catch (err) {
+        console.error("Error fetching user stats:", err)
       }
     }
 
-    if (session) {
-      fetchData()
-    }
+    fetchUserStats()
   }, [session])
+
 
   // Fetch challenges from Supabase via API
   useEffect(() => {

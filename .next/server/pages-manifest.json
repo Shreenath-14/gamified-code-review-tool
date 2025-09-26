@@ -2,12 +2,15 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/": "pages/index.js",
-  "/api/auth/[...nextauth]": "pages/api/auth/[...nextauth].js",
-  "/login": "pages/login.js",
   "/dashboard": "pages/dashboard.js",
+  "/api/auth/[...nextauth]": "pages/api/auth/[...nextauth].js",
   "/api/leaderboard": "pages/api/leaderboard.js",
+  "/api/user/[email]": "pages/api/user/[email].js",
+  "/login": "pages/login.js",
   "/api/challenges": "pages/api/challenges.js",
-  "/challenges": "pages/challenges.js",
-  "/leaderboard": "pages/leaderboard.js"
+  "/challenges/[id]": "pages/challenges/[id].js",
+  "/api/challenges/[id]": "pages/api/challenges/[id].js",
+  "/api/validate": "pages/api/validate.js",
+  "/leaderboard": "pages/leaderboard.js",
+  "/challenges": "pages/challenges.js"
 }
