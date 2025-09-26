@@ -33,7 +33,7 @@ This platform gamifies the code review process — learners solve coding challen
 
 🛠️ Tech Stack
 
-Frontend: Next.js, React, Tailwind CSS
+Frontend: Next.js, React, Tailwind CSS 
 Backend: Next.js API Routes (Node.js), vm2 (sandboxed code execution)
 Database: MongoDB Atlas + Mongoose
 Auth: NextAuth (Google/GitHub)
@@ -63,7 +63,8 @@ GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
-
+NEXT_PUBLIC_SUPABASE_URL=use_your_supabse_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=use_your_Anon_supabse_URL
 
 4. Run development server
 
