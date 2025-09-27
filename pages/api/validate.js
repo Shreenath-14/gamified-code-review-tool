@@ -2,13 +2,7 @@
 import vm from "vm"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "./auth/[...nextauth]"
-import { createClient } from "@supabase/supabase-js"
-
-// ✅ setup supabase
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
+import { supabaseAdmin } from "../../lib/supabaseAdmin"
 
 // deep equality helper
 function deepEqual(a, b) {
@@ -37,7 +31,7 @@ export default async function handler(req, res) {
   }
 
   // ✅ fetch challenge from Supabase
-  const { data: challenge, error: supError } = await supabase
+  const { data: challenge, error: supError } = await supabaseAdmin
     .from("challenges")
     .select("*")
     .eq("id", challengeId)
@@ -81,7 +75,6 @@ export default async function handler(req, res) {
       }
     `
 
-    // run user code + capture function
     const script = new vm.Script(detectionCode)
     script.runInContext(sandbox, { timeout: 1000 })
 
@@ -121,7 +114,7 @@ export default async function handler(req, res) {
     }
 
     // ✅ update user stats in Supabase
-    const { data: existing } = await supabase
+    const { data: existing } = await supabaseAdmin
       .from("users")
       .select("*")
       .eq("email", userId)
@@ -130,7 +123,7 @@ export default async function handler(req, res) {
     const newScore = (existing?.score || 0) + (challenge.points || 0)
     const newSolved = [...(existing?.solved || []), challenge.id]
 
-    await supabase.from("users").upsert({
+    await supabaseAdmin.from("users").upsert({
       email: userId,
       score: newScore,
       solved: newSolved,

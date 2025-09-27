@@ -1,6 +1,10 @@
+// pages/challenges/[id].js
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import Editor from "@monaco-editor/react"
+import dynamic from "next/dynamic"
+
+// ✅ Fix SSR error with Monaco on Vercel
+const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false })
 
 export default function ChallengeDetail() {
   const router = useRouter()
@@ -11,10 +15,8 @@ export default function ChallengeDetail() {
   const [code, setCode] = useState("// Write your solution here\nfunction solution() {\n  // your code\n}")
   const [result, setResult] = useState(null)
 
-  // Fetch challenge details
   useEffect(() => {
     if (!id) return
-
     async function fetchChallenge() {
       try {
         const res = await fetch(`/api/challenges/${id}`)
@@ -27,27 +29,20 @@ export default function ChallengeDetail() {
         setLoading(false)
       }
     }
-
     fetchChallenge()
   }, [id])
 
-  // Submit code for validation
   async function handleSubmit() {
     if (!challenge) return
-
     try {
       const res = await fetch("/api/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code,
-          challengeId: challenge.id, // ✅ send only the id
-        }),
+        body: JSON.stringify({ code, challengeId: challenge.id }),
       })
-
       const data = await res.json()
       setResult(data)
-    } catch (err) {
+    } catch {
       setResult({ success: false, message: "Error validating code" })
     }
   }
@@ -85,7 +80,7 @@ export default function ChallengeDetail() {
       {result && (
         <div className="mt-4 p-4 border rounded bg-gray-50">
           {result.success ? (
-            <p className="text-green-600">✅ {result.message || "All test cases passed!"}</p>
+            <p className="text-green-600">✅ {result.message}</p>
           ) : (
             <p className="text-red-600">❌ {result.message}</p>
           )}

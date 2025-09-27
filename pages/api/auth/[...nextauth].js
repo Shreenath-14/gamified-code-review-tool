@@ -1,3 +1,4 @@
+// pages/api/auth/[...nextauth].js
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import GitHubProvider from "next-auth/providers/github"
@@ -23,5 +24,4 @@ export const authOptions = {
   },
 }
 
-// Default NextAuth export (still required by Next.js)
 export default NextAuth(authOptions)
