@@ -2,7 +2,7 @@ import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import GitHubProvider from "next-auth/providers/github"
 
-export default NextAuth({
+export const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -21,4 +21,7 @@ export default NextAuth({
       return session
     },
   },
-})
+}
+
+// Default NextAuth export (still required by Next.js)
+export default NextAuth(authOptions)
