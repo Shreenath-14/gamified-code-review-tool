@@ -28,25 +28,32 @@ export default function Dashboard() {
     return null
   }
 
-  // Fetch user stats directly from Supabase API
+  // Fetch user stats + leaderboard
   useEffect(() => {
     async function fetchUserStats() {
       if (!session?.user?.email) return
 
       try {
+        // fetch user data
         const res = await fetch(`/api/user/${session.user.email}`)
         if (!res.ok) throw new Error("Failed to fetch user stats")
         const data = await res.json()
 
         setXp(data.score || 0)
-        setSolved((data.solved || []).length || 0)
+        setSolved((data.solved || []).length)
 
-        // rank could still be from leaderboard if you want
+        // fetch leaderboard for rank
         const leaderboardRes = await fetch("/api/leaderboard")
         if (leaderboardRes.ok) {
           const lbData = await leaderboardRes.json()
+
           const sorted = [...lbData].sort((a, b) => b.score - a.score)
-          const index = sorted.findIndex((p) => p.email === session.user.email)
+
+          // find current user by email
+          const index = sorted.findIndex(
+            (p) => p.name === session.user.email.split("@")[0]
+          )
+
           if (index !== -1) setRank(`#${index + 1}`)
         }
       } catch (err) {
@@ -57,15 +64,14 @@ export default function Dashboard() {
     fetchUserStats()
   }, [session])
 
-
-  // Fetch challenges from Supabase via API
+  // Fetch challenges
   useEffect(() => {
     async function fetchChallenges() {
       try {
         const res = await fetch("/api/challenges")
         if (!res.ok) throw new Error("Failed to fetch challenges")
         const data = await res.json()
-        setChallenges(data.slice(0, 6)) // show only top 6 popular challenges
+        setChallenges(data.slice(0, 6)) // top 6
       } catch (err) {
         console.error("Error fetching challenges:", err)
       }

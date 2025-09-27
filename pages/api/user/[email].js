@@ -7,12 +7,9 @@ const supabase = createClient(
 )
 
 export default async function handler(req, res) {
-  const {
-    query: { email },
-    method,
-  } = req
+  const { email } = req.query
 
-  if (method !== "GET") {
+  if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" })
   }
 
@@ -25,14 +22,10 @@ export default async function handler(req, res) {
       .from("users")
       .select("*")
       .eq("email", email)
-      .single()
+      .maybeSingle()
 
-    if (error && error.code !== "PGRST116") {
-      // PGRST116 = no rows found
-      throw error
-    }
+    if (error) throw error
 
-    // If user doesn’t exist yet, return defaults
     if (!data) {
       return res.status(200).json({
         email,
@@ -41,7 +34,11 @@ export default async function handler(req, res) {
       })
     }
 
-    return res.status(200).json(data)
+    return res.status(200).json({
+      email: data.email,
+      score: data.score || 0,
+      solved: data.solved || [],
+    })
   } catch (err) {
     console.error("Error fetching user:", err)
     return res.status(500).json({ error: "Failed to fetch user" })
